@@ -1,0 +1,41 @@
+name: v35-lifecycle-observation-RED
+
+on:
+  pull_request:
+    paths:
+      - 'scripts/lifecycle_acceptance_observer.py'
+      - 'tests/test_lifecycle_observer.py'
+      - '.github/workflows/v35-lifecycle-observation.yml'
+      - 'docs/LIFECYCLE_ACCEPTANCE.md'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: read
+  pull-requests: read
+
+jobs:
+  native-provider-observation:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Verify observer's own no-network, no-writer rules
+        run: python -m unittest discover -s tests -p 'test_lifecycle_observer.py' -v
+      - name: Live read-only GitHub lifecycle observation — expected RED
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          python scripts/lifecycle_acceptance_observer.py \
+            --repository reallaksh19/relay-v35-e2e-lab \
+            --output LIFECYCLE_ACCEPTANCE.json
+      - name: Upload provider evidence even when lifecycle RED
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: v35-lifecycle-observation-${{ github.run_id }}
+          path: LIFECYCLE_ACCEPTANCE.json
+          if-no-files-found: warn
+          retention-days: 30
