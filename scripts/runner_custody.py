@@ -57,6 +57,13 @@ def valid_reconciliation(report: dict, head: str, report_digest: str) -> None:
             or report.get("blockers") != []
             or report.get("writer_authorization") != "DENIED"
             or report.get("custody_transfer") != "NOT_EXECUTED"
+            or report.get("mode") not in ("PLANNED", "EMERGENCY")
+            or not all(re.fullmatch(r"[0-9a-f]{64}", str(report.get(k, "")))
+                       for k in ("frozen_plan_digest", "frozen_bundle_digest"))
+            or report.get("source", {}).get("base_is_ancestor") is not True
+            or report.get("source", {}).get("dirty_paths") != []
+            or report.get("source", {}).get("out_of_scope_changes") != []
+            or not report.get("source", {}).get("branch")
             or report.get("source", {}).get("candidate_head") != head
             or report.get("remote", {}).get("status") != "MATCH"
             or report.get("remote", {}).get("remote_head") != head):
