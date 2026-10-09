@@ -3,6 +3,8 @@
 
 **Purpose:** Determine whether preparing an independent Runner around ~70% of Agent A's estimated usable episode life **consumed** produces a better, source-grounded continuation than a conventional handover, checkpoint, event summary or fresh cold reading. The optimum threshold and actual advantage are **UNKNOWN**.
 
+**Agent A command entrypoint:** [Prepare for runner and proactive Time for Runner](RUNNER_PREPARE_COMMAND.md). Any perceived 70% threshold must be evidence-graded; explicit Owner preparation works even with UNKNOWN tokens. This file remains manual evaluation guidance, not a background trigger.
+
 **This document is an operator/reviewer guide, not a model prompt.** Stage 1 Runner receives only the separately sanitized [Stage 1 prompt](../fixtures/runner_benchmark/STAGE1_GOLDEN_PROMPT.md) and original source packet. Stage 2 prompt, this guide, answers, and all predecessor-current evidence are forbidden until the external stage barrier is met.
 
 ## 1. The minimal experiment
@@ -29,7 +31,7 @@ Do not merely ask models for a summary. Give the same real objective and require
 
 Before Stage 1, prepare only the allowed originals using [static packet formats](RUNNER_STATIC_PACKET_FORMATS.md). Use a genuinely new agent context. Physically limit repository/source and connected-app read access; disable ordinary GitHub PR/current-branch search and avoid sharing the current chat transcript. Run negative attempted-read checks if tools permit, and retain denial evidence outside the Runner context.
 
-A statement like "I promise not to look" is **not** an isolation test. Neither a Markdown \`Stage1\` heading nor a plan SHA proves a clean context. If isolation is unavailable, label the resulting reasoning **RESEARCH_REHEARSAL / BLINDNESS_UNVERIFIED** and do not falsely claim an independent live study.
+A statement like "I promise not to look" is **not** an isolation test. Neither a Markdown `Stage1` heading nor a plan SHA proves a clean context. If isolation is unavailable, label the resulting reasoning **RESEARCH_REHEARSAL / BLINDNESS_UNVERIFIED** and do not falsely claim an independent live study.
 
 Runner writes only an external research response. Operator freezes its raw content, verifies exact immutable readback and keeps Q1/Q2/Q3 unchanged. Only after explicit Stage 2 read permission may Runner see A's actual plan, candidate code and latest provider observations. Production source writer admission is a different permission requiring fencing.
 
