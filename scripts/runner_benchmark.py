@@ -186,7 +186,7 @@ def freeze_stage1(dest: Path, independent_plan: Path) -> dict:
     manifest = read_json(dest / "manifest.json")
     packet = read_json(dest / "stage1_packet.json")
     if (manifest.get("condition") not in RUNNER_CONDITIONS or
-            sha(canonical(packet)) != manifest.get("packet_sha256")):
+            sha((dest / "stage1_packet.json").read_bytes()) != manifest.get("packet_sha256")):
         raise BenchmarkError("Stage1 packet tampered")
     plan = read_json(independent_plan)
     if set(plan) != PLAN_KEYS or plan.get("schema") != "RUNNER_BENCH_STAGE1_PLAN_V1":
@@ -231,7 +231,7 @@ def release(cases: dict[str, dict], cid: str, condition: str, repeat: int,
     else:
         _audit_dir(dest, allowed)
     original_packet = read_json(dest / name)
-    if sha(canonical(original_packet)) != manifest.get("packet_sha256"):
+    if sha((dest / name).read_bytes()) != manifest.get("packet_sha256"):
         raise BenchmarkError("original packet changed")
     pkt = {"schema": "RUNNER_BENCH_PACKET_V1", "trial_id": tid, "case_id": cid,
            "condition": condition, "phase": "STAGE2",
