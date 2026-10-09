@@ -1,0 +1,69 @@
+schema: relay-v3.2-delp-execution-graph
+programme:
+  id: LAB-V35-R14-ONE-DELP-PROTO
+  root: relay-v35-e2e-lab#1
+  repository: reallaksh19/relay-v35-e2e-lab
+  total_weight: 10000
+  decomposition_policy:
+    mode: ENFORCED
+nodes:
+- ref: relay-v35-e2e-lab#1
+  kind: ROOT
+- ref: relay-v35-e2e-lab#2
+  kind: LEAF
+  parent: relay-v35-e2e-lab#1
+  weight: 1
+  responsibility_id: LAB-R1-PARSER
+  depends_on: []
+  outcome: Deterministic, strict CSV parser rejects invalid records.
+  write_surface:
+  - src/inventorylab/parser.py
+  - tests/test_inventory_parser.py
+  size_budget:
+    target_loc: 300
+    hard_loc: 800
+    target_minutes: 15
+    hard_minutes: 20
+  units:
+  - id: U01
+    weight: 35
+    verify: Valid rows parse with Decimal precision
+    outcome: Valid rows parse with Decimal precision
+  - id: U02
+    weight: 35
+    verify: Invalid and repeated SKUs fail closed
+    outcome: Invalid and repeated SKUs fail closed
+  - id: U03
+    weight: 30
+    verify: Exact-head parser unit tests pass after interruption recovery
+    outcome: Exact-head parser unit tests pass after interruption recovery
+- ref: relay-v35-e2e-lab#3
+  kind: LEAF
+  parent: relay-v35-e2e-lab#1
+  weight: 1
+  responsibility_id: LAB-R2-REPORT
+  depends_on:
+  - relay-v35-e2e-lab#2
+  outcome: Deterministic SKU-sorted JSON report and CLI.
+  write_surface:
+  - src/inventorylab/report.py
+  - src/inventorylab/__main__.py
+  - tests/test_inventory_report.py
+  size_budget:
+    target_loc: 300
+    hard_loc: 800
+    target_minutes: 15
+    hard_minutes: 20
+  units:
+  - id: U01
+    weight: 35
+    verify: Rows are sorted deterministically
+    outcome: Rows are sorted deterministically
+  - id: U02
+    weight: 35
+    verify: Exact Decimal item and total values are preserved
+    outcome: Exact Decimal item and total values are preserved
+  - id: U03
+    weight: 30
+    verify: Exact-head end-to-end CLI tests pass
+    outcome: Exact-head end-to-end CLI tests pass

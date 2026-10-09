@@ -1,0 +1,11 @@
+{
+  "live_writer": "OFF",
+  "owner_source_authentication": "SYNTHETIC_LAB_ONLY",
+  "parent_issue": 1,
+  "parser_issue": 2,
+  "parser_pr": null,
+  "programme_acceptance": "NOT_PROVEN",
+  "report_issue": 3,
+  "report_pr": null,
+  "repository": "reallaksh19/relay-v35-e2e-lab"
+}

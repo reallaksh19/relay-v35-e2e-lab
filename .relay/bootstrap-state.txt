@@ -1,0 +1,5 @@
+CREATED_PRIVATE_REPO_ISSUES_PENDING
+PARENT_URL=https://github.com/reallaksh19/relay-v35-e2e-lab/issues/1
+PARSER_URL=https://github.com/reallaksh19/relay-v35-e2e-lab/issues/2
+REPORT_URL=https://github.com/reallaksh19/relay-v35-e2e-lab/issues/3
+ISSUES_CREATED_GRAPH_READY
