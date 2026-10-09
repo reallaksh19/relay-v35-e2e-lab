@@ -99,9 +99,9 @@ class NativeWP0Falsifiers(unittest.TestCase):
             seen.add(f)
             source = f.read_text(encoding="utf-8")
             self.assertNotRegex(
-                source, r"delp_projection|DELP\\.project\\(|delp\\.project\\(|child_process|spawnSync|execFile",
+                source, r"delp_projection|DELP\.project\(|delp\.project\(|child_process|spawnSync|execFile",
                 f"unexpected DELP call/bridge in {f.name}")
-            for dep in re.findall(r"""(?:^|\\n)\\s*import\\s+(?:[^'\\n]*?\\s+from\\s+)?['"]\\./([^'"]+)['"]""", source):
+            for dep in re.findall(r"""(?:^|\n)\s*import\s+(?:[^'\n]*?\s+from\s+)?['"]\./([^'"]+)['"]""", source):
                 queue.append(f.parent / dep)
         self.assertEqual(13, len(seen), "inspect closure growth before interpreting result")
         print("N2 STATIC_IMPORT_NEGATIVE 13 real ESM files; no programme DELP call located")
