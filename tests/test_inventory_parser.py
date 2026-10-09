@@ -22,3 +22,27 @@ class ParserContract(unittest.TestCase):
         for text in ("sku,quantity\nA,2\n", "sku,quantity,unit_price\nA,1,NaN\n"):
             with self.subTest(text=text), self.assertRaises(ValueError):
                 parse_inventory_csv(text)
+
+    def test_blank_sku_fails_closed(self):
+        for text in ("sku,quantity,unit_price\n,1,1.00\n", "sku,quantity,unit_price\n   ,1,1.00\n"):
+            with self.subTest(text=text), self.assertRaises(ValueError):
+                parse_inventory_csv(text)
+
+    def test_negative_price_fails_closed(self):
+        with self.assertRaises(ValueError):
+            parse_inventory_csv("sku,quantity,unit_price\nA,1,-0.01\n")
+
+    def test_invalid_and_malformed_cells_fail_closed(self):
+        cases = (
+            "sku,quantity,unit_price\nA,not_an_int,1.00\n",
+            "sku,quantity,unit_price\nA,1,not_a_price\n",
+            "sku,quantity,unit_price\nA,1\n",
+            "sku,quantity,unit_price\nA,1,1.00,extra\n",
+            "sku,quantity,unit_price\nA,1,Infinity\n",
+            "sku,quantity,unit_price\nA,1,-Infinity\n",
+            "",
+            "   \n\t\n",
+        )
+        for text in cases:
+            with self.subTest(text=text), self.assertRaises(ValueError):
+                parse_inventory_csv(text)
