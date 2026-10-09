@@ -39,6 +39,8 @@ def main() -> int:
     ap.add_argument('--db', type=Path, required=True)
     ap.add_argument('--operator-key-file', type=Path, required=True)
     ap.add_argument('--client-uid', type=int, required=True)
+    ap.add_argument('--successor-client-uid', type=int,
+                    help='separate Agent-B Unix identity; mandatory for GitHub-lab')
     ap.add_argument('--local-remote', type=Path)
     ap.add_argument('--ssh-identity-file', type=Path)
     ap.add_argument('--ssh-known-hosts-file', type=Path)
@@ -53,6 +55,8 @@ def main() -> int:
         else:
             if args.allow_same_uid_in_lab_tests or args.local_remote is not None:
                 raise CustodyDenied("real GitHub mode forbids local identity bypass")
+            if args.successor_client_uid is None:
+                raise CustodyDenied("GitHub-lab requires separate Agent-B Unix identity")
             provider = GitRefProvider(
                 'git@github.com:reallaksh19/relay-v35-e2e-lab.git',
                 ssh_identity_file=args.ssh_identity_file,
@@ -65,7 +69,10 @@ def main() -> int:
         # Bootstrap and signing keys are never available over the socket.
         server = PrivateLabGateway(
             args.socket, BrokeredGitWriter(custody, provider),
-            expected_client_uid=args.client_uid,
+            expected_client_uid=(args.client_uid if args.successor_client_uid is None else None),
+            agent_uids=({"Agent-A": args.client_uid,
+                         "Agent-B": args.successor_client_uid}
+                        if args.successor_client_uid is not None else None),
             allow_same_uid_in_tests=args.allow_same_uid_in_lab_tests,
         )
         # Ensure a service termination closes the socket rather than leaving a
