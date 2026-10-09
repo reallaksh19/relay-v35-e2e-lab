@@ -12,6 +12,7 @@ spec.loader.exec_module(M)
 class Fixture:
     def __init__(self, *, include_root_plan=False):
         self.calls = []
+        self.requests = []  # hermetic provider readback log, not an asserted live fetch
         self.include_root_plan = include_root_plan
 
     def get(self, endpoint):
