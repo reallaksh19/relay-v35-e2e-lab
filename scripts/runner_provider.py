@@ -10,6 +10,8 @@ from __future__ import annotations
 import hashlib
 import os
 import re
+import shlex
+import stat
 import subprocess
 import tempfile
 from pathlib import Path
@@ -33,17 +35,46 @@ class GitRefProvider:
     """
 
     def __init__(self, remote: str, branch: str = "lab/runner-provider-sandbox", *,
-                 allow_local_test_remote: bool = False):
+                 allow_local_test_remote: bool = False,
+                 ssh_identity_file: Path | None = None,
+                 ssh_known_hosts_file: Path | None = None):
         if not isinstance(remote, str) or not remote or not isinstance(branch, str) or not REF.fullmatch(branch) or '..' in branch or '//' in branch or branch.endswith(('.lock', '/', '.')):
             raise CustodyDenied("invalid pinned remote or branch")
         if allow_local_test_remote:
+            if ssh_identity_file is not None or ssh_known_hosts_file is not None:
+                raise CustodyDenied("local test mode cannot accept provider SSH credentials")
             if not Path(remote).resolve().is_dir():
                 raise CustodyDenied("local test remote missing")
         elif not re.fullmatch(r"git@github\.com:reallaksh19/relay-v35-e2e-lab\.git", remote):
             raise CustodyDenied("production transport requires pinned lab GitHub repository")
+        elif branch != "lab/runner-provider-sandbox":
+            raise CustodyDenied("production transport is pinned to disposable sandbox branch")
         self.remote, self.branch = remote, branch
-        self.env = {k: os.environ[k] for k in ('PATH', 'HOME', 'SSH_AUTH_SOCK') if k in os.environ}
-        self.env.update(GIT_TERMINAL_PROMPT='0', GIT_CONFIG_NOSYSTEM='1', GIT_OPTIONAL_LOCKS='0')
+        # Deliberately do not inherit HOME, SSH_AUTH_SOCK, GIT_CONFIG_*,
+        # GIT_SSH_COMMAND or repo hooks from an executor process.
+        self.env = {'PATH': os.environ.get('PATH', '/usr/bin:/bin'),
+                    'GIT_TERMINAL_PROMPT': '0', 'GIT_CONFIG_NOSYSTEM': '1',
+                    'GIT_CONFIG_GLOBAL': os.devnull, 'GIT_OPTIONAL_LOCKS': '0'}
+        if not allow_local_test_remote:
+            def private_file(path: Path | None, mask: int) -> Path:
+                if not isinstance(path, Path) or not path.is_absolute() or path.is_symlink():
+                    raise CustodyDenied("absolute non-symlink controller SSH file required")
+                try:
+                    info = path.stat()
+                except OSError as exc:
+                    raise CustodyDenied("controller SSH configuration unavailable") from exc
+                if (not stat.S_ISREG(info.st_mode) or info.st_uid != os.getuid()
+                        or info.st_mode & mask):
+                    raise CustodyDenied("controller SSH file ownership/mode invalid")
+                return path
+            identity = private_file(ssh_identity_file, 0o077)
+            hosts = private_file(ssh_known_hosts_file, 0o022)
+            self.env['GIT_SSH_COMMAND'] = (
+                'ssh -F /dev/null -o BatchMode=yes -o IdentitiesOnly=yes '
+                '-o StrictHostKeyChecking=yes -o GlobalKnownHostsFile=/dev/null '
+                '-o UserKnownHostsFile=' + shlex.quote(str(hosts)) +
+                ' -i ' + shlex.quote(str(identity))
+            )
 
     def command(self, *args: str, cwd: Path | None = None, input_data: bytes | None = None,
                 timeout: int = 15) -> subprocess.CompletedProcess:
@@ -140,13 +171,13 @@ class BrokeredGitWriter:
                                            hashlib.sha256(content).hexdigest(), self.provider.branch)
             new_head, _ = self.provider.commit_and_push(expected_head, path, content, operation_id, record)
         except ProviderUncertain:
-            self.custody.finish(operation_id, 'UNKNOWN', 'PROVIDER_OUTCOME_UNKNOWN', self.provider.head)
+            self.custody.finish(operation_id, 'UNKNOWN', 'PROVIDER_OUTCOME_UNKNOWN', lambda: '')
             raise
         except Exception:
             # If no intent was persisted, no push was dispatched. If an intent
             # exists, even local errors are conservatively held for inspection.
             if self.custody.intent(operation_id) is not None:
-                self.custody.finish(operation_id, 'UNKNOWN', 'CANDIDATE_OUTCOME_UNCERTAIN', self.provider.head)
+                self.custody.finish(operation_id, 'UNKNOWN', 'CANDIDATE_OUTCOME_UNCERTAIN', lambda: '')
             else:
                 self.custody.finish(operation_id, 'FAILED', 'PRE_PUSH_CONSTRUCTION_FAILED', self.provider.head)
             raise
