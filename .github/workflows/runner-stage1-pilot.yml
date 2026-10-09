@@ -15,6 +15,7 @@ on:
       - 'tests/test_runner_provider.py'
       - 'tests/test_runner_gateway.py'
       - 'tests/test_runner_gateway_service.py'
+      - 'tests/test_runner_cross_uid.py'
       - 'docs/RUNNER_STAGE1_PILOT.md'
       - 'docs/RUNNER_STAGE2_PILOT.md'
       - 'docs/RUNNER_CUSTODY_PILOT.md'
@@ -35,6 +36,7 @@ on:
       - 'tests/test_runner_provider.py'
       - 'tests/test_runner_gateway.py'
       - 'tests/test_runner_gateway_service.py'
+      - 'tests/test_runner_cross_uid.py'
       - 'docs/RUNNER_STAGE1_PILOT.md'
       - 'docs/RUNNER_STAGE2_PILOT.md'
       - 'docs/RUNNER_CUSTODY_PILOT.md'
@@ -57,6 +59,6 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
       - name: Compile Stage 1-2 and RNR-05/06B broker files
-        run: python -m py_compile scripts/runner_pilot.py scripts/runner_stage2.py scripts/runner_custody.py scripts/runner_provider.py scripts/runner_gateway.py scripts/runner_gateway_service.py tests/test_runner_gateway.py tests/test_runner_gateway_service.py
-      - name: Run full source, custody, provider and private gateway tests
+        run: python -m py_compile scripts/runner_pilot.py scripts/runner_stage2.py scripts/runner_custody.py scripts/runner_provider.py scripts/runner_gateway.py scripts/runner_gateway_service.py tests/test_runner_gateway.py tests/test_runner_gateway_service.py tests/test_runner_cross_uid.py
+      - name: Run source, custody, provider and cross-UID tests (cross-UID may SKIP without privileged Linux identities)
         run: python -m unittest discover -s tests -p 'test_runner*.py' -v
