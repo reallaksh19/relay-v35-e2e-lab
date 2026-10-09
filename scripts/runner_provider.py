@@ -27,7 +27,7 @@ class ProviderUncertain(CustodyDenied):
 class GitRefProvider:
     """Verified branch ref observations + ref-leased Git commit creation.
 
-    remote and branch MUST be configured by the privileged operator; never
+    `remote` and `branch` MUST be configured by the privileged operator; never
     accept a runner's supplied remote URL. Use a separate private credential
     identity for each hosted broker, never shared with Agent A/B.
     """
