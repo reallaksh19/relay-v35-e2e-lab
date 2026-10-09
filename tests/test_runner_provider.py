@@ -1,8 +1,8 @@
 """RNR-06 native local Git push --force-with-lease, uncertain outcome recovery."""
 import secrets
 import subprocess
-import os
 import sys
+import os
 import tempfile
 import unittest
 from pathlib import Path
