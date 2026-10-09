@@ -1,0 +1,43 @@
+name: lab-runner-rnr07-comparison-harness
+on:
+  push:
+    branches: ['lab/rnr07-*']
+    paths:
+      - 'scripts/runner_benchmark.py'
+      - 'tests/test_runner_benchmark.py'
+      - 'fixtures/runner_benchmark/**'
+      - 'docs/GOLDEN_PROMPTS_HOW_WHAT.md'
+      - 'docs/RNR07_EXPERIMENT_PROTOCOL.md'
+      - '.github/workflows/runner-benchmark-rnr07.yml'
+  pull_request:
+    paths:
+      - 'scripts/runner_benchmark.py'
+      - 'tests/test_runner_benchmark.py'
+      - 'fixtures/runner_benchmark/**'
+      - 'docs/GOLDEN_PROMPTS_HOW_WHAT.md'
+      - 'docs/RNR07_EXPERIMENT_PROTOCOL.md'
+      - '.github/workflows/runner-benchmark-rnr07.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  bench-contract:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ['3.11', '3.12']
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Compile benchmark and test suite
+        run: python -m py_compile scripts/runner_benchmark.py tests/test_runner_benchmark.py
+      - name: Verify blinded prompts and hidden oracle controls
+        run: python -m unittest discover -s tests -p 'test_runner_benchmark.py' -v
+      - name: Verify fixture and planned matrix (not executed agent trials)
+        run: |
+          python scripts/runner_benchmark.py validate
+          python scripts/runner_benchmark.py matrix --seed 35 --repeats 3 > /tmp/rnr07-unexecuted-matrix.json
+          python -c "import json; m=json.load(open('/tmp/rnr07-unexecuted-matrix.json')); assert m['number_of_trials']==168 and m['results']=='NOT_EXECUTED'"
