@@ -1,4 +1,4 @@
-name: runner-stage1-stage2-custody-pilot
+name: runner-stage1-stage2-custody-provider-pilot
 on:
   push:
     branches: ['lab/runner-stage1-*']
@@ -6,12 +6,15 @@ on:
       - 'scripts/runner_pilot.py'
       - 'scripts/runner_stage2.py'
       - 'scripts/runner_custody.py'
+      - 'scripts/runner_provider.py'
       - 'tests/test_runner_pilot.py'
       - 'tests/test_runner_stage2.py'
       - 'tests/test_runner_custody.py'
+      - 'tests/test_runner_provider.py'
       - 'docs/RUNNER_STAGE1_PILOT.md'
       - 'docs/RUNNER_STAGE2_PILOT.md'
       - 'docs/RUNNER_CUSTODY_PILOT.md'
+      - 'docs/RUNNER_PROVIDER_CAS_PILOT.md'
       - '.github/workflows/runner-stage1-pilot.yml'
   pull_request:
     paths:
@@ -40,7 +43,7 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
-      - name: Compile RNR-01 through RNR-05 pilots
-        run: python -m py_compile scripts/runner_pilot.py scripts/runner_stage2.py scripts/runner_custody.py tests/test_runner_pilot.py tests/test_runner_stage2.py tests/test_runner_custody.py
-      - name: Runner RNR-01–05 native positive and adversarial tests
+      - name: Compile RNR-01 through RNR-06 pilots
+        run: python -m py_compile scripts/runner_pilot.py scripts/runner_stage2.py scripts/runner_custody.py scripts/runner_provider.py tests/test_runner_pilot.py tests/test_runner_stage2.py tests/test_runner_custody.py tests/test_runner_provider.py
+      - name: Runner RNR-01–06 native Git CAS and adversarial tests
         run: python -m unittest discover -s tests -p 'test_runner*.py' -v
