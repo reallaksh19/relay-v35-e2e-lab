@@ -1,6 +1,7 @@
 """RNR-06 native local Git push --force-with-lease, uncertain outcome recovery."""
 import secrets
 import subprocess
+import os
 import sys
 import tempfile
 import unittest
@@ -183,6 +184,43 @@ class GitBrokerCases(unittest.TestCase):
             P.GitRefProvider('git@github.com:untrusted/other.git')
         with self.assertRaises(C.CustodyDenied):
             P.GitRefProvider('git@github.com:reallaksh19/relay-v35-e2e-lab.git', branch='../evil')
+
+    def test_real_github_provider_refuses_ambient_ssh_without_pinned_identity(self):
+        with self.assertRaises(C.CustodyDenied):
+            P.GitRefProvider('git@github.com:reallaksh19/relay-v35-e2e-lab.git')
+
+    def test_pinned_ssh_transport_excludes_ambient_tokens_and_ssh_agent(self):
+        private = self.root / 'service-principal'
+        private.mkdir(mode=0o700)
+        key, hosts = private / 'id_ed25519', private / 'known_hosts'
+        key.write_text('test fixture only; not a functional SSH identity')
+        hosts.write_text('github.com ssh-ed25519 LOCAL_TEST_PLACEHOLDER\n')
+        key.chmod(0o600)
+        hosts.chmod(0o600)
+        old = os.environ.get('SSH_AUTH_SOCK')
+        os.environ['SSH_AUTH_SOCK'] = '/tmp/attacker-agent.sock'
+        try:
+            provider = P.GitRefProvider(
+                'git@github.com:reallaksh19/relay-v35-e2e-lab.git',
+                ssh_identity_file=key, ssh_known_hosts_file=hosts)
+        finally:
+            if old is None:
+                os.environ.pop('SSH_AUTH_SOCK', None)
+            else:
+                os.environ['SSH_AUTH_SOCK'] = old
+        self.assertNotIn('SSH_AUTH_SOCK', provider.env)
+        self.assertNotIn('HOME', provider.env)
+        self.assertIn('StrictHostKeyChecking=yes', provider.env['GIT_SSH_COMMAND'])
+        self.assertIn(str(key), provider.env['GIT_SSH_COMMAND'])
+        self.assertIn(str(hosts), provider.env['GIT_SSH_COMMAND'])
+        with self.assertRaises(C.CustodyDenied):
+            P.GitRefProvider('git@github.com:reallaksh19/relay-v35-e2e-lab.git',
+                             branch='main', ssh_identity_file=key,
+                             ssh_known_hosts_file=hosts)
+        key.chmod(0o644)
+        with self.assertRaises(C.CustodyDenied):
+            P.GitRefProvider('git@github.com:reallaksh19/relay-v35-e2e-lab.git',
+                             ssh_identity_file=key, ssh_known_hosts_file=hosts)
 
     def test_old_agent_direct_push_is_possible_if_credentials_not_removed(self):
         # Negative oracle: proves broker state alone CANNOT prevent an agent with
