@@ -7,7 +7,7 @@ Scope: reallaksh19/relay-v35-e2e-lab issue #9, draft PR #10. No production V3.5,
 - scripts/runner_custody.py implements a SQLite-backed single-host transaction gate for LAB-R1.
 - Monotonic epoch: Agent A starts at epoch 1, promotion to B increments to 2. Rebootstrap and stale/duplicate promotions fail closed.
 - HMAC-SHA256 transfer grant: binds responsibility, predecessor epoch and identity, successor identity and new capability hash, current candidate SHA, SHA256 of Stage 2 reconciliation, transfer ID and external operator receipt. Agent-authored reconciliation cannot sign its own grant.
-- Stage 2 input must declare RUNNER_RECONCILIATION_V1, clean source, zero blockers, exact candidate and remote ref, and explicitly DENIED writer authorization. Still not independently authenticated Owner permission.
+- Stage 2 input must declare RUNNER_RECONCILIATION_V1, both frozen Stage 1 SHA256 digests, planned/emergency mode, clean ancestor/branch/dirty/out-of-scope source, zero blockers, exact candidate and remote ref, and explicitly DENIED writer authorization. Still not independently authenticated Owner permission.
 - Begin fencing: immediately stops all new old-agent write admissions; already admitted writes remain tracked.
 - Complete promotion: refuses STARTED and UNKNOWN write operations, uncertain source oracle and moved candidate. Fresh provider observation must match signed candidate.
 - Write admission: requires current agent, epoch, opaque capability, exact parser/test path, unique operation ID and trusted source oracle matching active SHA. This is ONLY broker admission, not a committed remote GitHub write.
@@ -34,7 +34,7 @@ HMAC key proves possession of controller key, NOT identity or scope of the human
     python -m py_compile scripts/runner_pilot.py scripts/runner_stage2.py scripts/runner_custody.py
     python -m unittest discover -s tests -p 'test_runner*.py' -v
 
-24 new adversarial RNR-05 tests cover signed grant tampering, duplicate promotion, old token denial, source drift, uncommitted operation HOLD, uncertain provider result HOLD, wrong successor credential, competing transfers, parallel promotion on shared DB, scoped paths and audit events.
+26 new adversarial RNR-05 tests cover signed grant tampering, duplicate promotion, old token denial, source drift, uncommitted operation HOLD, uncertain provider result HOLD, wrong successor credential, competing transfers, parallel promotion on shared DB, scoped paths and audit events.
 
 ## Still open
 
