@@ -31,7 +31,7 @@ These files were independently synthesized; no Common golden fixture is copied i
 4. **Force competing designs, not a single favored solution.** Two materially different approaches and symmetric tests are mandatory. A decision is provisional until actual source facts can disprove alternatives. Estimates without measurements remain UNKNOWN.
 5. **Build falsification into the first plan.** Positive/negative/golden/currentness/crash/browser cases should follow from Owner's use case. An all-unmatched parity check is not positive engineering match qualification; a passing component is not an integrated user result.
 6. **Require typed provenance without replacing thought.** Tables for \`source line → observed behavior → consumer → assertion → falsifier\` force auditability. The table captures conclusions and concise justifications, **not private step-by-step chain of thought**.
-7. **Force three *real* open questions.** Q1 investigates source path and consumer; Q2 material/current evidence; Q3 legal next unit and custody. They must be stored in the unaltered Stage 1 artifact, not composed with hindsight in Stage 2.
+7. **Force three *real*, domain-derived open questions.** For LFJ they may concern original source functions, configurable consumer semantics and full XML/CSV/browser validation; for V3.5 they may concern original Owner-to-handover paths, evidence projection and legal next units. Let authentic task/source determine Q1/Q2/Q3, and store their exact words in the unaltered Stage 1 artifact. Never replace them with easier questions in Stage 2.
 8. **Stage 2 is a new intellectual task.** Verify Agent A's disclosures; reopen actual frozen B plan; physically inspect candidate source/Owner graph/tests/browser; use a four-perspective matrix and identify when A is better, B is better or both missed a requirement.
 9. **Treat ROI as an engineering choice rather than an activity list.** High-ROI already correctly completed work is absorbed rather than reimplemented; an unverified High claim requires proof; missing High within current scope is proposed for integration; Medium is parked with value/cost/reentry; Low is declined. New scope or weights require an Owner decision.
 10. **Stop at the right boundary.** A brilliant reconciled plan can be useful even if old Agent A credentials remain active. The prompts do not authorize a write. The existing external security prototype is separate and unqualified for real GitHub custody.
@@ -87,13 +87,27 @@ This is *independence*, not contrarianism.
 | Claim honesty | Observed/executed/source-authenticated vs UNKNOWN | Fake provider tokens, telemetry or review |
 | Value | A justified High-ROI next unit and parked Medium alternative | Long checklist without decisions |
 
-## 5. Why no new runtime code belongs in this PR
+## 5. Does the preexisting laboratory CODE match these instructions?
+
+**Verdict: useful mechanism fragments, but NO — not the complete Runner operating model.** The older code is not copied into the revised prompt PR.
+
+| Prior lab capability | What it actually demonstrates | What the Common prompt instructions demand instead |
+|---|---|---|
+| \`runner_pilot.py\` Stage 1 JSON + freeze | Pins a few lab paths and validates a compact plan schema | A truly fresh B must read actual original consumer functions, evaluate competing designs and publish a substantive independent plan with falsifiers and real source receipt |
+| \`runner_stage2.py\` source reconciliation | Detects git/head/scope discrepancies and produces structural flags | B must make an Owner/B/A/current-source **four-view engineering judgment** across the real product/lifecycle, reject its own mistakes and answer its original three questions |
+| \`runner_custody.py\` and gateway | Locally models writer epochs, Git CAS and Unix user/ACL fences | Only an externally authorized controller with *real* GitHub credential exclusivity can prove promotion; those local tests are not a Runner's engineering insight |
+| \`runner_benchmark.py\` synthetic scoring (REMOVED in this PR) | Would have counted predetermined flags on invented cases | Genuine fresh model sessions need distinct source-grounded designs, accurate observations, human/provider verification and authentic outcome/cost comparison |
+| Short Stage 1/2 prompts (REPLACED) | Would have elicited mostly structured summaries | The revamped prompts require source investigations, alternatives, counterexamples, negative oracles, careful ROI and explicitly non-copying plan reconciliation |
+
+The old programmatic mechanics can remain in separately gated lab [PR #10](https://github.com/reallaksh19/relay-v35-e2e-lab/pull/10) for a different security/governance decision. **Do not mistake them for proof that B independently thinks or that the agent-level experiment has happened.**
+
+## 6. Why no new runtime code belongs in this PR
 
 Python can compare hashes or score static fixture keywords. It **cannot** by itself prove that a new model genuinely investigated original source, understood the Owner's outcome, found a better plan, exercised an actual Chromium journey, or had no prior exposure. Encoding expected answers into the same source tree may *reduce* independence.
 
 Likewise, a YAML stage transition is not a cognitive method and does not grant safe GitHub credentials. A real externally trusted orchestrator is a separate deployment project. For the requested prompt study, the useful assets are **human-readable operator restrictions, the two Markdown prompts, static intake/reality formats, worked counterexamples and a reviewer rubric**. Any future automation should implement those proven boundaries rather than define the architecture by accident.
 
-## 6. Review and decision boundary
+## 7. Review and decision boundary
 
 A prompt review may conclude:
 - **FORM_PRESENT:** necessary substantive questions, output, negative examples and source fields are present.
