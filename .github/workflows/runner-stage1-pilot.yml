@@ -21,6 +21,7 @@ on:
       - 'docs/RUNNER_CUSTODY_PILOT.md'
       - 'docs/RUNNER_PROVIDER_CAS_PILOT.md'
       - 'docs/RUNNER_GATEWAY_SERVICE_PILOT.md'
+      - 'docs/RUNNER_REAL_UID_ACCEPTANCE.md'
       - '.github/workflows/runner-stage1-pilot.yml'
   pull_request:
     paths:
@@ -42,6 +43,7 @@ on:
       - 'docs/RUNNER_CUSTODY_PILOT.md'
       - 'docs/RUNNER_PROVIDER_CAS_PILOT.md'
       - 'docs/RUNNER_GATEWAY_SERVICE_PILOT.md'
+      - 'docs/RUNNER_REAL_UID_ACCEPTANCE.md'
       - '.github/workflows/runner-stage1-pilot.yml'
   workflow_dispatch:
 permissions:
