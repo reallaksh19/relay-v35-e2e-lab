@@ -95,9 +95,12 @@ class _Handler(socketserver.StreamRequestHandler):
             peer = self.request.getsockopt(socket.SOL_SOCKET, socket.SO_PEERCRED,
                                            struct.calcsize('3i'))
             _, uid, _ = struct.unpack('3i', peer)
-            validate_peer_uid(uid, server.expected_client_uid, os.getuid(),
-                              allow_same_uid_in_tests=server.allow_same_uid_in_tests)
             parsed = _parse_request(self.rfile.readline(MAX_LINE + 1))
+            # Kernel-attested UID must match the *operator-bound* agent name.
+            # A successor never inherits the predecessor's Unix principal.
+            expected_uid = server.agent_uids.get(parsed["agent"])
+            validate_peer_uid(uid, expected_uid, os.getuid(),
+                              allow_same_uid_in_tests=server.allow_same_uid_in_tests)
             response = self.server.writer.write(  # type: ignore[attr-defined]
                 agent=parsed["agent"], epoch=parsed["epoch"],
                 token=parsed["capability"], operation_id=parsed["operation_id"],
@@ -121,15 +124,28 @@ class PrivateLabGateway(socketserver.ThreadingMixIn, socketserver.UnixStreamServ
 
     def __init__(self, socket_path: Path, writer: BrokeredGitWriter, *,
                  expected_client_uid: int | None = None,
+                 agent_uids: dict[str, int] | None = None,
                  allow_same_uid_in_tests: bool = False):
         validate_socket_location(socket_path)
-        if type(expected_client_uid) is not int or expected_client_uid < 0:
-            raise CustodyDenied("explicit agent Unix identity required")
-        if expected_client_uid == os.getuid() and not allow_same_uid_in_tests:
+        if agent_uids is None:
+            if type(expected_client_uid) is not int or expected_client_uid < 0:
+                raise CustodyDenied("explicit agent Unix identity required")
+            # Single-identity mode exists only for local legacy test harnesses.
+            if not allow_same_uid_in_tests:
+                raise CustodyDenied("distinct per-agent Unix identities required")
+            bindings = {"Agent-A": expected_client_uid, "Agent-B": expected_client_uid}
+        else:
+            if (set(agent_uids) != {"Agent-A", "Agent-B"} or
+                    any(type(uid) is not int or uid < 0 for uid in agent_uids.values()) or
+                    (agent_uids["Agent-A"] == agent_uids["Agent-B"] and
+                     not allow_same_uid_in_tests)):
+                raise CustodyDenied("two distinct operator-bound agent UIDs required")
+            bindings = dict(agent_uids)
+        if not allow_same_uid_in_tests and os.getuid() in bindings.values():
             raise CustodyDenied("privileged broker UID cannot also be an agent UID")
         self.writer = writer
         self.socket_path = socket_path
-        self.expected_client_uid = expected_client_uid
+        self.agent_uids = bindings
         self.allow_same_uid_in_tests = allow_same_uid_in_tests
         super().__init__(str(socket_path), _Handler)
         os.chmod(socket_path, 0o600)
