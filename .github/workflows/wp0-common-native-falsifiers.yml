@@ -1,0 +1,68 @@
+name: wp0-common-native-falsifiers
+on:
+  push:
+    branches:
+      - test/wp0-common-cross-engine-native-20261009
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  python-native:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ['3.11', '3.12']
+    steps:
+      - name: Checkout lab tests
+        uses: actions/checkout@v4
+        with:
+          path: lab
+      - name: Checkout immutable Common source
+        uses: actions/checkout@v4
+        with:
+          repository: reallaksh19/Common
+          ref: c053352162997c0a0dfd12901f8086707503c0de
+          path: common
+          persist-credentials: false
+      - name: Verify exact source commit and tools
+        run: |
+          test "$(git -C common rev-parse HEAD)" = "c053352162997c0a0dfd12901f8086707503c0de"
+          git -C common status --porcelain
+          git -C common rev-parse HEAD
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install test-only dependencies
+        run: python -m pip install PyYAML jsonschema
+      - name: N1 native C6 handover regressions
+        run: |
+          python -m unittest discover -s common/skills/engineering-pr-delivery-v3.2/tests -p 'test_handover_context.py' -v
+          python -m unittest discover -s common/skills/engineering-pr-delivery-v3.2/tests -p 'test_handover_ledger_projection.py' -v
+      - name: N3 actual V3.2 continuity vs DELP policy counterexample
+        env:
+          COMMON_CHECKOUT: ${{ github.workspace }}/common
+        run: python lab/scripts/wp0_common_native_falsifiers.py
+  node-native:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        node-version: ['22', '24']
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: lab
+      - uses: actions/checkout@v4
+        with:
+          repository: reallaksh19/Common
+          ref: c053352162997c0a0dfd12901f8086707503c0de
+          path: common
+          persist-credentials: false
+      - name: Verify exact source commit
+        run: test "$(git -C common rev-parse HEAD)" = "c053352162997c0a0dfd12901f8086707503c0de"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+      - name: N2 native Node RELAY full-chain tests
+        run: node --test common/skills/engineering-relay-v1/full-chain-rehearsal-v1.test.mjs
