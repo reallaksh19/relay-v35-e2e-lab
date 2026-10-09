@@ -94,6 +94,9 @@ class LabGateway:
                       "id TEXT PRIMARY KEY, responsibility TEXT NOT NULL, epoch INTEGER NOT NULL, "
                       "holder TEXT NOT NULL, path TEXT NOT NULL, candidate_head TEXT NOT NULL, "
                       "status TEXT NOT NULL, evidence_ref TEXT)")
+            c.execute("CREATE TABLE IF NOT EXISTS operation_intents ("
+                      "operation_id TEXT PRIMARY KEY, intended_head TEXT NOT NULL, "
+                      "content_digest TEXT NOT NULL, branch TEXT NOT NULL)")
             c.execute("CREATE TABLE IF NOT EXISTS transfers ("
                       "id TEXT PRIMARY KEY, responsibility TEXT NOT NULL, old_epoch INTEGER NOT NULL, "
                       "new_epoch INTEGER NOT NULL, old_holder TEXT NOT NULL, new_holder TEXT NOT NULL, "
@@ -313,6 +316,66 @@ class LabGateway:
                        grant["from_agent"], grant["to_agent"], grant["candidate_head"], grant["reconciliation_digest"]))
             self.audit(c, resp, "PROMOTED", grant["transfer_id"])
             return self.read_in_tx(c, resp)
+
+    def record_intent(self, operation_id: str, intended_head: str,
+                      content_digest: str, branch: str) -> None:
+        """Controller-only durable commit intent BEFORE Git CAS dispatch."""
+        validate_id(operation_id)
+        require_sha(intended_head)
+        if not re.fullmatch(r"[0-9a-f]{64}", str(content_digest)) or not isinstance(branch, str) or not branch:
+            raise CustodyDenied("invalid durable provider intent")
+        with self.tx() as c:
+            op = c.execute("SELECT * FROM operations WHERE id=?", (operation_id,)).fetchone()
+            if not op or op["status"] != "STARTED":
+                raise CustodyDenied("intent requires an admitted in-flight operation")
+            if c.execute("SELECT 1 FROM operation_intents WHERE operation_id=?", (operation_id,)).fetchone():
+                raise CustodyDenied("intent already recorded; no duplicate dispatch")
+            c.execute("INSERT INTO operation_intents VALUES (?,?,?,?)",
+                      (operation_id, intended_head, content_digest, branch))
+            self.audit(c, op["responsibility"], "PROVIDER_INTENT", operation_id)
+
+    def intent(self, operation_id: str) -> dict | None:
+        validate_id(operation_id)
+        with self.tx() as c:
+            row = c.execute("SELECT * FROM operation_intents WHERE operation_id=?", (operation_id,)).fetchone()
+            return dict(row) if row else None
+
+    def resolve_unknown(self, operation_id: str, *, provider_head: str,
+                        quiescence_receipt: str, source_oracle: Callable[[], str]) -> str:
+        """Privileged recovery ONLY. No replay of a potentially applied write.
+
+        The caller must independently certify all broker Git worker processes
+        are terminated and cannot complete a late push. That external check is
+        NOT supplied by this library. A forged receipt invalidates safety.
+        """
+        validate_id(operation_id)
+        require_sha(provider_head)
+        if not isinstance(quiescence_receipt, str) or not quiescence_receipt.strip():
+            raise CustodyDenied("authenticated quiescence receipt required")
+        with self.tx() as c:
+            op = c.execute("SELECT * FROM operations WHERE id=?", (operation_id,)).fetchone()
+            intent = c.execute("SELECT * FROM operation_intents WHERE operation_id=?", (operation_id,)).fetchone()
+            if not op or op["status"] != "UNKNOWN" or not intent:
+                raise CustodyDenied("not a recoverable, intended UNKNOWN operation")
+            current = self.row(c, op["responsibility"])
+            if (current["epoch"] != op["epoch"] or current["holder"] != op["holder"]):
+                raise CustodyDenied("epoch changed during unknown write")
+            if source_oracle() != provider_head:
+                raise CustodyDenied("provider readback changed during recovery")
+            if provider_head == intent["intended_head"]:
+                result = "SUCCEEDED"
+                c.execute("UPDATE custody SET active_head=? WHERE responsibility=?",
+                          (provider_head, op["responsibility"]))
+            elif provider_head == op["candidate_head"]:
+                # Allowed ONLY with genuine external process quiescence and
+                # provider verification; cannot infer it solely from old SHA.
+                result = "FAILED"
+            else:
+                raise CustodyDenied("provider moved to third-party/ambiguous head")
+            c.execute("UPDATE operations SET status=?, evidence_ref=? WHERE id=?",
+                      (result, quiescence_receipt, operation_id))
+            self.audit(c, op["responsibility"], "RECOVERED_" + result, operation_id)
+            return result
 
     def audit_events(self, responsibility: str) -> list[dict]:
         with self.tx() as c:
