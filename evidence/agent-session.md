@@ -1,0 +1,24 @@
+# Local Agent Session Context & Identity Record
+
+- **Prompt ID:** `V35-CAMPAIGN-A-LOCAL-AGENT-V3`
+- **Agent Provider / Model:** Google DeepMind Antigravity / Gemini 3.8 Flash (High)
+- **Session Label:** `local-agent-session-r14-campaign-a-01`
+- **Operator (Asserted):** `reallaksh19`
+- **Principal Identity Grade:** `ASSERTED_NOT_PROVIDER_VERIFIED`
+- **Git Version:** `git version 2.56.0.windows.1`
+- **GitHub CLI Version:** `gh version 2.101.0 (2026-09-15)`
+- **Python Version:** `Python 3.12.14`
+- **System Timezone:** `UTC+04:00`
+- **Source Package ZIP SHA256:** `0a561495d15ddc9619ca55e8b418288639459f7269065d556150761e5fdfd24b`
+- **Local Checkout Path:** `c:\CodeB\relay-v35-e2e-lab` (strictly local record; sensitive local paths redacted before external publication)
+- **Common Exact Source Pin:** `13989969f6b7e432c4f7c1ddfe975449dba53593`
+- **Material Lab Target:** `reallaksh19/relay-v35-e2e-lab`, PRIVATE
+- **Current GitHub Lab Repo Existence:** `NOT_FOUND` (404, unprovisioned)
+- **Current GitHub Lab Repo Visibility:** `N/A` (unprovisioned)
+- **Permitted Read/Write Scope:**
+  - Local filesystem execution and test harness runs: `PERMITTED`
+  - GitHub issue comment writes on `reallaksh19/Common#875` for bounded `TASK_EVIDENCE` publication: `PERMITTED`
+  - Production branches/issues write on `reallaksh19/Common`: `DENIED`
+  - Scoreboard / production live writer: `OFF / DENIED`
+  - Automatic merge / self-review approval: `OFF / DENIED`
+  - Lab repo writes: `HELD` until T01 live provisioning

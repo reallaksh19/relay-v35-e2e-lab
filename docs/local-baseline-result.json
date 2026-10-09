@@ -1,0 +1,33 @@
+{
+  "bootstrap": {
+    "partial_run_policy": "ONE_SHOT_FAIL_CLOSED_MANUAL_RECONCILIATION",
+    "status": "CODE_REVIEWED_NOT_EXECUTED_WITH_GITHUB"
+  },
+  "canonical_common_delp_run": "NOT_RUN",
+  "github_lab_created": false,
+  "harness": {
+    "all_passed": true,
+    "cases": 12,
+    "exit": 0,
+    "notes": "12 self-tests after evidence-generator negative controls; current scaffold local execution"
+  },
+  "independent_review": "NOT_SUBMITTED",
+  "programme_acceptance": "AC0/8",
+  "python_version": "3.13.5",
+  "read_only_writer": "OFF",
+  "scope": "local_sandbox_scaffold_only",
+  "source_commit": "13989969f6b7e432c4f7c1ddfe975449dba53593",
+  "task_evidence_generator": {
+    "github_comment_publish": "NOT_RUN",
+    "local_tests": "PASS",
+    "source_authentication": "NOT_PROVEN"
+  },
+  "toy_app": {
+    "cases": 6,
+    "exit": 1,
+    "expected_red": true,
+    "not_implemented_errors": 7,
+    "notes": "six inventory methods, seven expected NotImplementedError errors; no feature implemented"
+  },
+  "v35_native_join_run": "NOT_RUN"
+}

@@ -1,0 +1,16 @@
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+.env
+.gh-token
+.relay/projection.json
+.relay/observations.json
+.relay/facts.md
+
+# Local-agent session logs and audit drafts must not be silently pushed by bootstrap
+evidence/audit/
+evidence/package-validation/
+evidence/logs/
+evidence/T*-local.md
+evidence/*.draft.md
