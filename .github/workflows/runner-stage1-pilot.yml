@@ -1,23 +1,29 @@
-name: runner-stage1-and-stage2-pilot
+name: runner-stage1-stage2-custody-pilot
 on:
   push:
     branches: ['lab/runner-stage1-*']
     paths:
       - 'scripts/runner_pilot.py'
       - 'scripts/runner_stage2.py'
+      - 'scripts/runner_custody.py'
       - 'tests/test_runner_pilot.py'
       - 'tests/test_runner_stage2.py'
+      - 'tests/test_runner_custody.py'
       - 'docs/RUNNER_STAGE1_PILOT.md'
       - 'docs/RUNNER_STAGE2_PILOT.md'
+      - 'docs/RUNNER_CUSTODY_PILOT.md'
       - '.github/workflows/runner-stage1-pilot.yml'
   pull_request:
     paths:
       - 'scripts/runner_pilot.py'
       - 'scripts/runner_stage2.py'
+      - 'scripts/runner_custody.py'
       - 'tests/test_runner_pilot.py'
       - 'tests/test_runner_stage2.py'
+      - 'tests/test_runner_custody.py'
       - 'docs/RUNNER_STAGE1_PILOT.md'
       - 'docs/RUNNER_STAGE2_PILOT.md'
+      - 'docs/RUNNER_CUSTODY_PILOT.md'
       - '.github/workflows/runner-stage1-pilot.yml'
   workflow_dispatch:
 permissions:
@@ -34,7 +40,7 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
-      - name: Compile Stage 1 and Stage 2 pilots
-        run: python -m py_compile scripts/runner_pilot.py scripts/runner_stage2.py tests/test_runner_pilot.py tests/test_runner_stage2.py
-      - name: Runner RNR-01–04 native positive and adversarial tests
+      - name: Compile RNR-01 through RNR-05 pilots
+        run: python -m py_compile scripts/runner_pilot.py scripts/runner_stage2.py scripts/runner_custody.py tests/test_runner_pilot.py tests/test_runner_stage2.py tests/test_runner_custody.py
+      - name: Runner RNR-01–05 native positive and adversarial tests
         run: python -m unittest discover -s tests -p 'test_runner*.py' -v
