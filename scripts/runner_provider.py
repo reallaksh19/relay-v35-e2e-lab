@@ -171,6 +171,8 @@ class BrokeredGitWriter:
                                            hashlib.sha256(content).hexdigest(), self.provider.branch)
             new_head, _ = self.provider.commit_and_push(expected_head, path, content, operation_id, record)
         except ProviderUncertain:
+            # UNKNOWN never needs a provider HEAD read in LabGateway.finish.
+            # Do not lose the durable UNKNOWN status when the provider is down.
             self.custody.finish(operation_id, 'UNKNOWN', 'PROVIDER_OUTCOME_UNKNOWN', lambda: '')
             raise
         except Exception:
