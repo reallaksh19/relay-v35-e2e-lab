@@ -1,0 +1,66 @@
+name: runner-stage1-stage2-custody-provider-gateway-pilot
+on:
+  push:
+    branches: ['lab/runner-stage1-*']
+    paths:
+      - 'scripts/runner_pilot.py'
+      - 'scripts/runner_stage2.py'
+      - 'scripts/runner_custody.py'
+      - 'scripts/runner_provider.py'
+      - 'scripts/runner_gateway.py'
+      - 'scripts/runner_gateway_service.py'
+      - 'tests/test_runner_pilot.py'
+      - 'tests/test_runner_stage2.py'
+      - 'tests/test_runner_custody.py'
+      - 'tests/test_runner_provider.py'
+      - 'tests/test_runner_gateway.py'
+      - 'tests/test_runner_gateway_service.py'
+      - 'tests/test_runner_cross_uid.py'
+      - 'docs/RUNNER_STAGE1_PILOT.md'
+      - 'docs/RUNNER_STAGE2_PILOT.md'
+      - 'docs/RUNNER_CUSTODY_PILOT.md'
+      - 'docs/RUNNER_PROVIDER_CAS_PILOT.md'
+      - 'docs/RUNNER_GATEWAY_SERVICE_PILOT.md'
+      - 'docs/RUNNER_REAL_UID_ACCEPTANCE.md'
+      - '.github/workflows/runner-stage1-pilot.yml'
+  pull_request:
+    paths:
+      - 'scripts/runner_pilot.py'
+      - 'scripts/runner_stage2.py'
+      - 'scripts/runner_custody.py'
+      - 'scripts/runner_provider.py'
+      - 'scripts/runner_gateway.py'
+      - 'scripts/runner_gateway_service.py'
+      - 'tests/test_runner_pilot.py'
+      - 'tests/test_runner_stage2.py'
+      - 'tests/test_runner_custody.py'
+      - 'tests/test_runner_provider.py'
+      - 'tests/test_runner_gateway.py'
+      - 'tests/test_runner_gateway_service.py'
+      - 'tests/test_runner_cross_uid.py'
+      - 'docs/RUNNER_STAGE1_PILOT.md'
+      - 'docs/RUNNER_STAGE2_PILOT.md'
+      - 'docs/RUNNER_CUSTODY_PILOT.md'
+      - 'docs/RUNNER_PROVIDER_CAS_PILOT.md'
+      - 'docs/RUNNER_GATEWAY_SERVICE_PILOT.md'
+      - 'docs/RUNNER_REAL_UID_ACCEPTANCE.md'
+      - '.github/workflows/runner-stage1-pilot.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  isolated-runner-contract:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ['3.11', '3.12']
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Compile Stage 1-2 and RNR-05/06B broker files
+        run: python -m py_compile scripts/runner_pilot.py scripts/runner_stage2.py scripts/runner_custody.py scripts/runner_provider.py scripts/runner_gateway.py scripts/runner_gateway_service.py tests/test_runner_gateway.py tests/test_runner_gateway_service.py tests/test_runner_cross_uid.py
+      - name: Run source, custody, provider and cross-UID tests (cross-UID may SKIP without privileged Linux identities)
+        run: python -m unittest discover -s tests -p 'test_runner*.py' -v
