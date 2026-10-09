@@ -1,4 +1,4 @@
-"""Feature A contract: strict CSV ingestion."""
+"""Feature A contract: strict CSV ingestion. Replaces initial NotImplementedError stub."""
 import csv
 from decimal import Decimal, InvalidOperation
 import io
