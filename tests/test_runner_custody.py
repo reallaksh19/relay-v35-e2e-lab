@@ -37,10 +37,13 @@ class BrokerTests(unittest.TestCase):
 
     def reconciliation(self, head):
         return {'schema': 'RUNNER_RECONCILIATION_V1', 'responsibility': 'LAB-R1',
+                'mode': 'EMERGENCY', 'frozen_plan_digest': 'd'*64,
+                'frozen_bundle_digest': 'e'*64,
                 'source_reconciliation': 'SOURCE_RECONCILED_READ_ONLY',
                 'blockers': [], 'writer_authorization': 'DENIED',
                 'custody_transfer': 'NOT_EXECUTED',
-                'source': {'candidate_head': head},
+                'source': {'candidate_head': head, 'base_is_ancestor': True,
+                           'dirty_paths': [], 'out_of_scope_changes': [], 'branch': 'main'},
                 'remote': {'status': 'MATCH', 'remote_head': head}}
 
     def make_grant(self, next_holder, transfer_id='handoff-1', head=HEAD0):
@@ -80,6 +83,25 @@ class BrokerTests(unittest.TestCase):
         self.grant = self.make_grant('Agent-B')
         with self.assertRaises(C.CustodyDenied):
             self.b.begin_fence(self.grant, self.report)
+
+    def test_real_stage2_freeze_and_repository_observation_admitted_read_only(self):
+        import test_runner_stage2 as ST
+        t = ST.Stage2Tests('test_emergency_no_handover_remains_read_only')
+        t.setUp()
+        try:
+            actual = t.reconcile()
+            self.assertEqual(actual['source_reconciliation'], 'SOURCE_RECONCILED_READ_ONLY')
+            C.valid_reconciliation(actual, t.base, S1.digest(S1.canonical(actual)))
+            # Actual Stage 2 has no writer authority despite source success.
+            self.assertEqual(actual['writer_authorization'], 'DENIED')
+        finally:
+            t.tearDown()
+
+    def test_read_only_report_missing_frozen_plan_is_rejected(self):
+        changed = dict(self.report)
+        changed.pop('frozen_plan_digest')
+        with self.assertRaises(C.CustodyDenied):
+            C.valid_reconciliation(changed, HEAD0, S1.digest(S1.canonical(changed)))
 
     def test_agent_a_can_write_before_fence(self):
         receipt = self.admit_a()
