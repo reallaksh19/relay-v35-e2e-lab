@@ -8,8 +8,15 @@
 **Reusable prompt artifacts:**
 - [Stage 1 — independently reconstruct the engineering problem](../fixtures/runner_benchmark/STAGE1_GOLDEN_PROMPT.md)
 - [Stage 2 — challenge both plans against actual source](../fixtures/runner_benchmark/STAGE2_GOLDEN_PROMPT.md)
+- [Agent A invocation: Prepare for runner + proactive 70% Time for Runner](RUNNER_PREPARE_COMMAND.md)
 - [Static input and output formats](RUNNER_STATIC_PACKET_FORMATS.md)
 - [Manual falsifying cases / operator review](RNR07_EXPERIMENT_PROTOCOL.md)
+
+## 0. Command and advisory wiring — actual limits
+
+At semantic checkpoints, Agent A should inspect trustworthy provider session-life telemetry where available, distinguish an operator episode-budget proxy from risk observations, and recommend **"Time for Runner"** around 70% usable life **consumed** (or earlier on evidenced context-loss risk). The command **"Prepare for runner"** is immediately actionable regardless of a metric. It prepares two separate packets: historical WHAT/WHY-only Stage 1 for an independent B, and withheld current Agent A HOW/evidence for Stage 2. The Owner must not repeat repository/issues already known to Agent A.
+
+This is **agent instruction wiring inside the lab Markdown package**, not native ChatGPT telemetry, live automatic context monitoring, or a globally installed Common V3.5 command. See [full invocation/measurement contract](RUNNER_PREPARE_COMMAND.md). No automatic B startup, background watch, issue publication or write-epoch transfer can be claimed.
 
 ## 1. What was learned from Common PRs #880, #881 and #882 — analyze, do not copy
 
@@ -30,7 +37,7 @@ These files were independently synthesized; no Common golden fixture is copied i
 3. **Ask for a source *method*, not a fill-in-the-blank conclusion.** "Read caller and callee, walk data both directions, inspect original consumers, identify an invariant, challenge it with a concrete counterexample" is an actionable research sequence. "Explain the architecture" is not enough.
 4. **Force competing designs, not a single favored solution.** Two materially different approaches and symmetric tests are mandatory. A decision is provisional until actual source facts can disprove alternatives. Estimates without measurements remain UNKNOWN.
 5. **Build falsification into the first plan.** Positive/negative/golden/currentness/crash/browser cases should follow from Owner's use case. An all-unmatched parity check is not positive engineering match qualification; a passing component is not an integrated user result.
-6. **Require typed provenance without replacing thought.** Tables for \`source line → observed behavior → consumer → assertion → falsifier\` force auditability. The table captures conclusions and concise justifications, **not private step-by-step chain of thought**.
+6. **Require typed provenance without replacing thought.** Tables for `source line → observed behavior → consumer → assertion → falsifier` force auditability. The table captures conclusions and concise justifications, **not private step-by-step chain of thought**.
 7. **Force three *real*, domain-derived open questions.** For LFJ they may concern original source functions, configurable consumer semantics and full XML/CSV/browser validation; for V3.5 they may concern original Owner-to-handover paths, evidence projection and legal next units. Let authentic task/source determine Q1/Q2/Q3, and store their exact words in the unaltered Stage 1 artifact. Never replace them with easier questions in Stage 2.
 8. **Stage 2 is a new intellectual task.** Verify Agent A's disclosures; reopen actual frozen B plan; physically inspect candidate source/Owner graph/tests/browser; use a four-perspective matrix and identify when A is better, B is better or both missed a requirement.
 9. **Treat ROI as an engineering choice rather than an activity list.** High-ROI already correctly completed work is absorbed rather than reimplemented; an unverified High claim requires proof; missing High within current scope is proposed for integration; Medium is parked with value/cost/reentry; Low is declined. New scope or weights require an Owner decision.
@@ -70,7 +77,7 @@ This is *independence*, not contrarianism.
 
 **Insufficient:** "Add a dashboard, improve docs, rewrite the pipeline and scale to 90MB."
 
-**Better:** "The first missing physically connected dependency is \`[producer→consumer]\`; existing responsibility \`[ID]\` owns it and its acceptance. Proposed bounded unit: \`[one outcome]\` plus golden/changed-head/browser tests. Park optional dashboard and 90MB tuning pending authentic fixtures. Do not create a replacement responsibility because the executor changed."
+**Better:** "The first missing physically connected dependency is `[producer→consumer]`; existing responsibility `[ID]` owns it and its acceptance. Proposed bounded unit: `[one outcome]` plus golden/changed-head/browser tests. Park optional dashboard and 90MB tuning pending authentic fixtures. Do not create a replacement responsibility because the executor changed."
 
 ## 4. Minimal quality contracts
 
@@ -93,10 +100,10 @@ This is *independence*, not contrarianism.
 
 | Prior lab capability | What it actually demonstrates | What the Common prompt instructions demand instead |
 |---|---|---|
-| \`runner_pilot.py\` Stage 1 JSON + freeze | Pins a few lab paths and validates a compact plan schema | A truly fresh B must read actual original consumer functions, evaluate competing designs and publish a substantive independent plan with falsifiers and real source receipt |
-| \`runner_stage2.py\` source reconciliation | Detects git/head/scope discrepancies and produces structural flags | B must make an Owner/B/A/current-source **four-view engineering judgment** across the real product/lifecycle, reject its own mistakes and answer its original three questions |
-| \`runner_custody.py\` and gateway | Locally models writer epochs, Git CAS and Unix user/ACL fences | Only an externally authorized controller with *real* GitHub credential exclusivity can prove promotion; those local tests are not a Runner's engineering insight |
-| \`runner_benchmark.py\` synthetic scoring (REMOVED in this PR) | Would have counted predetermined flags on invented cases | Genuine fresh model sessions need distinct source-grounded designs, accurate observations, human/provider verification and authentic outcome/cost comparison |
+| `runner_pilot.py` Stage 1 JSON + freeze | Pins a few lab paths and validates a compact plan schema | A truly fresh B must read actual original consumer functions, evaluate competing designs and publish a substantive independent plan with falsifiers and real source receipt |
+| `runner_stage2.py` source reconciliation | Detects git/head/scope discrepancies and produces structural flags | B must make an Owner/B/A/current-source **four-view engineering judgment** across the real product/lifecycle, reject its own mistakes and answer its original three questions |
+| `runner_custody.py` and gateway | Locally models writer epochs, Git CAS and Unix user/ACL fences | Only an externally authorized controller with *real* GitHub credential exclusivity can prove promotion; those local tests are not a Runner's engineering insight |
+| `runner_benchmark.py` synthetic scoring (REMOVED in this PR) | Would have counted predetermined flags on invented cases | Genuine fresh model sessions need distinct source-grounded designs, accurate observations, human/provider verification and authentic outcome/cost comparison |
 | Short Stage 1/2 prompts (REPLACED) | Would have elicited mostly structured summaries | The revamped prompts require source investigations, alternatives, counterexamples, negative oracles, careful ROI and explicitly non-copying plan reconciliation |
 
 The old programmatic mechanics can remain in separately gated lab [PR #10](https://github.com/reallaksh19/relay-v35-e2e-lab/pull/10) for a different security/governance decision. **Do not mistake them for proof that B independently thinks or that the agent-level experiment has happened.**
