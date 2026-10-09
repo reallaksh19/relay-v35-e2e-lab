@@ -102,7 +102,7 @@ Copy the **exact Q1/Q2/Q3 wording from your frozen Stage 1 plan** into a compari
 - State a falsifier capable of changing your answer and the test/next source read that would settle it.
 - Identify whether the answer affects approved scope, authenticated Owner decision or execution safety.
 
-One of the answers must identify the **minimal currently legitimate existing unit** or an explicit HOLD with the missing gate. Never infer a usable new task from a newly created Runner issue.
+Separately, **after answering all three original questions**, identify the minimal legitimate existing execution unit or HOLD and its missing gate. Do not retrofit a generic next-unit question into Q1/Q2/Q3 if the frozen source-specific question concerns different engineering semantics. Never infer a new task from a newly created Runner issue.
 
 ## 5. Verify positive *and* negative acceptance
 
