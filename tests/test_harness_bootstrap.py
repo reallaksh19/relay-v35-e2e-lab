@@ -70,7 +70,7 @@ class BootstrapMockBoundary(unittest.TestCase):
         self.addCleanup(self.temp.cleanup)
         self.dir = Path(self.temp.name)
         self.work = self.dir / 'work'
-        shutil.copytree(ROOT, self.work, ignore=shutil.ignore_patterns('__pycache__', '*.pyc'))
+        shutil.copytree(ROOT, self.work, ignore=shutil.ignore_patterns('__pycache__', '*.pyc', '.git'))
         for stale in (self.work/'.relay/graph.yaml', self.work/'.relay/issue-map.json', self.work/'.relay/bootstrap-state.txt'):
             if stale.exists(): stale.unlink()
         self.bin = self.dir / 'bin'

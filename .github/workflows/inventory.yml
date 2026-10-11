@@ -18,6 +18,8 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
+      - name: Install exact harness dependency
+        run: python -m pip install 'PyYAML==6.0.2'
       - name: Scaffold contract — expected GREEN
         env:
           PYTHONPATH: src
